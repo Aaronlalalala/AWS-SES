@@ -26,3 +26,9 @@ pip install boto3
 移除了直接使用 SMTP 發送郵件的部分，因為現在所有的郵件發送都通過消息隊列系統處理。
 
 先前均皓的版本我存在Reference.txt中
+
+8/3 針對web註冊時進行驗證與彥君合作後成功達成此功能
+
+8/3 針對後端提供Model progress的api : project_get 進行功能增加
+(1) 從後端回傳模型之狀態後 依據status進行分流 並傳送不同的email_template 
+(2) 改進message_queue 容納多種status 所造成的多輸入多輸出之影響 進行有效排隊 

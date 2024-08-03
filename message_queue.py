@@ -54,7 +54,7 @@ class MessageQueue:
                 continue
             except Exception as e:
                 print(f"Error sending email: {e}")
-            time.sleep(1)  # 避免发送过快
+            time.sleep(1)  # Avoid sending too quickly
 
     def _send_email_with_attachment(self, sender, recipients, subject, body_text, body_html, image_path):
         msg = MIMEMultipart('related')

@@ -1,9 +1,8 @@
 import boto3
 import logging
-import requests
 from botocore.exceptions import WaiterError, ClientError
 
-from config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, get_single_project
+from config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
 from ses_identity import SesIdentity
 from ses_template import SesTemplate
 from message_queue import MessageQueue
@@ -13,11 +12,8 @@ from email_2 import EMAIL_SUBJECT2, EMAIL_BODY_TEXT2, EMAIL_BODY_HTML2
 from email_3 import EMAIL_SUBJECT3, EMAIL_BODY_TEXT3, EMAIL_BODY_HTML3
 
 def get_project_status(project_id):
-    response = requests.get(f"{get_single_project}/{project_id}")
-    if response.status_code == 200:
-        data = response.json()
-        return data.get('status'), data.get('email')
-    return None, None
+    # 模擬 API 響應
+    return "Model training in process", "9268michael@gmail.com"
 
 def usage_demo():
     print("-" * 88)
@@ -38,33 +34,31 @@ def usage_demo():
 
     email_server = "ntutlab321projects@gmail.com"
     
-    # Get project ID from user input
-    project_id = input("Enter the project ID: ")
+    # 模擬輸入項目 ID
+    project_id = "test_project_id"
     
-    # Get project status and email
+    # 獲取項目狀態和電子郵件
     status, recipient_email = get_project_status(project_id)
-    
-    if not status or not recipient_email:
-        print("Failed to get project status or email. Exiting.")
-        return
     
     print(f"Project status: {status}")
     print(f"Recipient email: {recipient_email}")
     
-    # Verify recipient email
+    # 驗證收件人電子郵件
     if ses_identity.get_identity_status(recipient_email) != "Success":
         print(f"Warning: The address '{recipient_email}' is not verified with Amazon SES.")
         verify = input("Do you want to verify this email? (y/n): ")
         if verify.lower() == 'y':
             ses_identity.verify_email_identity(recipient_email)
             print(f"Verification email sent to {recipient_email}. Please check the inbox and complete verification.")
+            print("After verification, please run this script again.")
+            return
         else:
             print("Exiting as the email is not verified.")
             return
 
     message_queue.start_processing()
 
-    # Send email based on project status
+    # 根據項目狀態發送電子郵件
     if status == "Model training ready":
         message_queue.add_message_with_attachment(
             email_server,
@@ -95,7 +89,7 @@ def usage_demo():
     else:
         print(f"Unknown status: {status}. No email sent.")
 
-    # Wait for all emails to be sent
+    # 等待所有電子郵件發送完成
     message_queue.wait_for_completion()
     message_queue.stop_processing()
 
